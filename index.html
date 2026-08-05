@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07111f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Generator Angka Lengkap Versi HP</title>
+
+  <style>
+    :root {
+      --bg: #050b14;
+      --panel: rgba(12, 26, 44, 0.9);
+      --line: rgba(86, 213, 255, 0.25);
+      --text: #f4fbff;
+      --muted: #9eb4c8;
+      --cyan: #4ee4ff;
+      --blue: #3178ff;
+      --green: #38f6a8;
+      --danger: #ff627e;
+      --shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 16px;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(49, 120, 255, 0.22), transparent 34%),
+        radial-gradient(circle at 86% 20%, rgba(78, 228, 255, 0.16), transparent 28%),
+        linear-gradient(145deg, #02060c, var(--bg) 45%, #08182a);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.22;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(78, 228, 255, 0.07);
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+      background: linear-gradient(90deg, #fff, var(--cyan), #8badff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      max-width: 800px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(160deg, var(--panel), rgba(5, 13, 24, 0.94));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .controls {
+      padding: 20px;
+    }
+
+    .card-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-bottom: 20px;
+      padding: 6px;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .mode-tab {
+      min-height: 42px;
+      padding: 7px 5px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .mode-tab.active {
+      color: #00121b;
+      border-color: rgba(78, 228, 255, .4);
+      background: linear-gradient(90deg, var(--cyan), #7ef8da);
+      box-shadow: 0 8px 22px rgba(78, 228, 255, .16);
+    }
+
+    .mode-panel {
+      display: none;
+    }
+
+    .mode-panel.active {
+      display: block;
+      animation: fadeIn .18s ease;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #dcecff;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    select,
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border: 1px solid rgba(126, 194, 255, 0.22);
+      border-radius: 14px;
+      outline: none;
+      color: var(--text);
+      background: rgba(2, 9, 18, 0.84);
+      font-size: 15px;
+      transition: .2s ease;
+    }
+
+    select:focus,
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(78, 228, 255, 0.09);
+    }
+
+    input::placeholder {
+      color: #647b90;
+    }
+
+    .field-hint {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .count-preview {
+      margin: 2px 0 15px;
+      padding: 11px 13px;
+      border: 1px solid rgba(78, 228, 255, .13);
+      border-radius: 13px;
+      color: #cbefff;
+      background: rgba(78, 228, 255, .045);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .count-preview strong {
+      color: var(--cyan);
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px;
+      margin-bottom: 17px;
+      border: 1px solid rgba(255,255,255,.055);
+      border-radius: 15px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .toggle-copy strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .toggle-copy small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 27px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #26384d;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 21px;
+      height: 21px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      transition: .2s ease;
+    }
+
+    .switch input:checked + .slider {
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(21px);
+    }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 14px;
+      font: inherit;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform .16s ease, filter .16s ease, opacity .16s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.07);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .primary {
+      color: #00121b;
+      background: linear-gradient(90deg, var(--cyan), #7ef8da);
+      box-shadow: 0 10px 28px rgba(78, 228, 255, 0.2);
+    }
+
+    .secondary {
+      color: #eaf8ff;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.065);
+    }
+
+    .danger {
+      color: #ffd9df;
+      border: 1px solid rgba(255, 98, 126, 0.2);
+      background: rgba(255, 98, 126, 0.10);
+    }
+
+    .note {
+      margin: 15px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .result-card {
+      min-height: 590px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 22px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background: rgba(255,255,255,.018);
+    }
+
+    .result-head h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .counter {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(78, 228, 255, 0.08);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .results {
+      flex: 1;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      padding: 22px;
+    }
+
+    .bulk-info {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .bulk-results {
+      width: 100%;
+      min-height: 470px;
+      resize: vertical;
+      padding: 16px;
+      border: 1px solid rgba(78, 228, 255, .22);
+      border-radius: 17px;
+      outline: none;
+      color: var(--text);
+      background: rgba(4, 12, 23, .88);
+      font: 700 15px/1.75 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .04em;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      box-shadow: inset 0 0 24px rgba(78, 228, 255, .025);
+    }
+
+    .bulk-results:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(78, 228, 255, 0.09);
+    }
+
+    .empty {
+      min-height: 430px;
+      display: grid;
+      place-items: center;
+      padding: 30px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .empty-icon {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 46px;
+      filter: drop-shadow(0 0 18px rgba(78, 228, 255, .3));
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 10;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 20px);
+      padding: 11px 16px;
+      border-radius: 12px;
+      color: #042016;
+      background: #eafff8;
+      font-weight: 850;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      box-shadow: 0 14px 38px rgba(0,0,0,.36);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    footer {
+      padding: 22px 12px 0;
+      color: #71879a;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .result-card {
+        min-height: 470px;
+      }
+
+      .bulk-results {
+        min-height: 360px;
+      }
+
+      .empty {
+        min-height: 330px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .controls {
+        padding: 16px;
+      }
+
+      .mode-tab {
+        font-size: 10px;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .result-head,
+      .results {
+        padding: 16px;
+      }
+    }
+    /* Optimasi khusus layar HP */
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+      overscroll-behavior-y: contain;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      touch-action: manipulation;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 14px 10px calc(22px + env(safe-area-inset-bottom));
+      }
+
+      .app {
+        width: 100%;
+      }
+
+      .hero {
+        margin-bottom: 15px;
+        padding: 5px 4px 0;
+      }
+
+      .badge {
+        padding: 7px 11px;
+        font-size: 11px;
+      }
+
+      h1 {
+        margin: 12px 0 7px;
+        font-size: clamp(29px, 9vw, 42px);
+        line-height: 1.05;
+      }
+
+      .subtitle {
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .layout {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .card {
+        border-radius: 19px;
+      }
+
+      .controls {
+        padding: 14px;
+        overflow: visible;
+      }
+
+      .card-title {
+        margin-bottom: 12px;
+        font-size: 17px;
+      }
+
+      .mode-tabs {
+        position: sticky;
+        z-index: 7;
+        top: 8px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 5px;
+        margin: 0 -2px 16px;
+        padding: 5px;
+        border-radius: 14px;
+        background: rgba(5, 15, 28, .96);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
+        backdrop-filter: blur(16px);
+      }
+
+      .mode-tab {
+        min-height: 48px;
+        padding: 7px 3px;
+        border-radius: 10px;
+        font-size: 10px;
+      }
+
+      .field {
+        margin-bottom: 13px;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      label {
+        margin-bottom: 7px;
+        font-size: 12px;
+      }
+
+      select,
+      input[type="number"],
+      input[type="text"] {
+        min-height: 51px;
+        padding: 0 13px;
+        border-radius: 13px;
+        font-size: 16px;
+      }
+
+      .field-hint {
+        margin-top: 6px;
+        font-size: 10px;
+      }
+
+      .count-preview {
+        margin-bottom: 13px;
+        padding: 10px 11px;
+        font-size: 10px;
+      }
+
+      .toggle-row {
+        padding: 12px;
+        margin-bottom: 14px;
+        border-radius: 13px;
+      }
+
+      .toggle-copy strong {
+        font-size: 12px;
+      }
+
+      .toggle-copy small {
+        font-size: 10px;
+      }
+
+      .actions {
+        position: sticky;
+        z-index: 6;
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin: 10px -2px 0;
+        padding: 8px;
+        border: 1px solid rgba(86, 213, 255, .14);
+        border-radius: 16px;
+        background: rgba(5, 15, 28, .95);
+        box-shadow: 0 -8px 26px rgba(0, 0, 0, .32);
+        backdrop-filter: blur(16px);
+      }
+
+      .actions .primary {
+        grid-column: 1 / -1;
+      }
+
+      button {
+        min-height: 50px;
+        border-radius: 12px;
+        font-size: 13px;
+      }
+
+      .note {
+        margin: 14px 3px 2px;
+        padding-bottom: 2px;
+        font-size: 10px;
+      }
+
+      .result-card {
+        min-height: 440px;
+      }
+
+      .result-head {
+        position: sticky;
+        z-index: 4;
+        top: 8px;
+        padding: 15px 14px;
+        background: rgba(7, 19, 34, .96);
+        backdrop-filter: blur(15px);
+      }
+
+      .result-head h2 {
+        font-size: 16px;
+      }
+
+      .counter {
+        padding: 6px 8px;
+        font-size: 10px;
+      }
+
+      .results {
+        gap: 10px;
+        padding: 13px;
+      }
+
+      .bulk-info {
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .bulk-results {
+        min-height: 340px;
+        max-height: 65vh;
+        padding: 13px;
+        border-radius: 14px;
+        font-size: 14px;
+        line-height: 1.65;
+        letter-spacing: .025em;
+      }
+
+      .empty {
+        min-height: 300px;
+        padding: 22px;
+        font-size: 13px;
+      }
+
+      .empty-icon {
+        font-size: 40px;
+      }
+
+      footer {
+        padding-top: 16px;
+        font-size: 10px;
+      }
+
+      .toast {
+        width: calc(100% - 28px);
+        max-width: 420px;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        padding: 11px 13px;
+        text-align: center;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      body {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      .controls {
+        padding: 12px;
+      }
+
+      .mode-tab {
+        font-size: 9px;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .actions .primary {
+        grid-column: auto;
+      }
+
+      .bulk-results {
+        min-height: 300px;
+        font-size: 13px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 520px) {
+      .hero {
+        display: none;
+      }
+
+      .layout {
+        gap: 10px;
+      }
+
+      .mode-tabs {
+        top: 4px;
+      }
+
+      .actions {
+        position: static;
+      }
+
+      .bulk-results {
+        min-height: 230px;
+        max-height: 55vh;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="hero">
+      <div class="badge">✦ Generator Kombinasi Angka</div>
+      <h1>Generator Angka Lengkap</h1>
+      <p class="subtitle">
+        Generator angka acak 2D–5D, Angka Tarung, dan BBFS.
+        Semua hasil dipisahkan dengan tanda bintang tanpa spasi:
+        <b>123*456*789</b>.
+      </p>
+    </header>
+
+    <section class="layout">
+      <aside class="card controls">
+        <h2 class="card-title">Pengaturan Generator</h2>
+
+        <div class="mode-tabs" role="tablist" aria-label="Jenis generator">
+          <button class="mode-tab active" type="button" data-mode="random">
+            Acak<br />2D–5D
+          </button>
+          <button class="mode-tab" type="button" data-mode="tarung">
+            Angka<br />Tarung
+          </button>
+          <button class="mode-tab" type="button" data-mode="bbfs">
+            BBFS<br />Generator
+          </button>
+        </div>
+
+        <section class="mode-panel active" id="randomPanel">
+          <div class="field">
+            <label for="randomDigits">Jenis angka</label>
+            <select id="randomDigits">
+              <option value="2">2D — 00 sampai 99</option>
+              <option value="3">3D — 000 sampai 999</option>
+              <option value="4" selected>4D — 0000 sampai 9999</option>
+              <option value="5">5D — 00000 sampai 99999</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="randomQuantity" id="randomQuantityLabel">
+              Jumlah kombinasi
+            </label>
+            <input
+              id="randomQuantity"
+              type="number"
+              min="1"
+              max="100000"
+              value="100"
+              inputmode="numeric"
+            />
+            <small class="field-hint" id="randomQuantityHint">
+              Maksimal mengikuti jenis angka yang dipilih.
+            </small>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-copy">
+              <strong>Tanpa hasil kembar</strong>
+              <small>Setiap hasil dibuat unik</small>
+            </div>
+            <label class="switch" aria-label="Tanpa hasil kembar">
+              <input id="randomUnique" type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="mode-panel" id="tarungPanel">
+          <div class="field-grid">
+            <div class="field">
+              <label for="tarungAs">AS</label>
+              <input
+                id="tarungAs"
+                type="text"
+                value="12"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="Contoh: 12"
+              />
+            </div>
+
+            <div class="field">
+              <label for="tarungKop">KOP</label>
+              <input
+                id="tarungKop"
+                type="text"
+                value="34"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="Contoh: 34"
+              />
+            </div>
+
+            <div class="field">
+              <label for="tarungKepala">KEPALA</label>
+              <input
+                id="tarungKepala"
+                type="text"
+                value="56"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="Contoh: 56"
+              />
+            </div>
+
+            <div class="field">
+              <label for="tarungEkor">EKOR</label>
+              <input
+                id="tarungEkor"
+                type="text"
+                value="78"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="Contoh: 78"
+              />
+            </div>
+          </div>
+
+          <small class="field-hint">
+            Masukkan digit untuk setiap posisi. Digit yang sama dalam satu
+            kolom otomatis dihitung satu kali.
+          </small>
+
+          <div class="count-preview" id="tarungPreview">
+            Perkiraan hasil: <strong>16 kombinasi 4D</strong>
+          </div>
+        </section>
+
+        <section class="mode-panel" id="bbfsPanel">
+          <div class="field">
+            <label for="bbfsDigits">Angka BBFS</label>
+            <input
+              id="bbfsDigits"
+              type="text"
+              value="123456"
+              maxlength="10"
+              inputmode="numeric"
+              placeholder="Contoh: 123456"
+            />
+            <small class="field-hint">
+              Masukkan kumpulan digit 0–9. Digit ganda otomatis dihapus.
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="bbfsLength">Panjang kombinasi</label>
+            <select id="bbfsLength">
+              <option value="2">2D</option>
+              <option value="3">3D</option>
+              <option value="4" selected>4D</option>
+              <option value="5">5D</option>
+            </select>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-copy">
+              <strong>Izinkan angka kembar</strong>
+              <small>Contoh: 1123 atau 5551</small>
+            </div>
+            <label class="switch" aria-label="Izinkan angka kembar">
+              <input id="bbfsRepeat" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="count-preview" id="bbfsPreview">
+            Perkiraan hasil: <strong>360 kombinasi</strong>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button class="primary" id="generateBtn" type="button">
+            ⚡ Generate Angka
+          </button>
+          <button class="secondary" id="copyBtn" type="button">
+            ⧉ Salin Semua
+          </button>
+          <button class="danger" id="clearBtn" type="button">
+            × Bersihkan
+          </button>
+        </div>
+
+        <p class="note">
+          Generator berjalan langsung di perangkat dan tidak menyimpan data.
+          Hasil angka bersifat acak atau kombinatorial dan tidak menjamin hasil
+          permainan maupun kemenangan.
+        </p>
+      </aside>
+
+      <section class="card result-card">
+        <div class="result-head">
+          <h2 id="resultTitle">Hasil Angka Acak</h2>
+          <span class="counter" id="counter">0 angka</span>
+        </div>
+
+        <div class="results" id="results" aria-live="polite">
+          <div class="empty">
+            <div>
+              <span class="empty-icon">🎲</span>
+              Pilih generator dan tekan<br />
+              <b>Generate Angka</b>.
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <footer>
+      Generator angka acak • Angka Tarung • BBFS • Format pemisah tanda *
+    </footer>
+  </main>
+
+  <div class="toast" id="toast">Berhasil disalin</div>
+
+  <script>
+    "use strict";
+
+    const MAX_OUTPUT = 100000;
+
+    const modeTabs = [...document.querySelectorAll(".mode-tab")];
+    const modePanels = [...document.querySelectorAll(".mode-panel")];
+
+    const randomDigitsEl = document.getElementById("randomDigits");
+    const randomQuantityEl = document.getElementById("randomQuantity");
+    const randomQuantityLabelEl =
+      document.getElementById("randomQuantityLabel");
+    const randomQuantityHintEl =
+      document.getElementById("randomQuantityHint");
+    const randomUniqueEl = document.getElementById("randomUnique");
+
+    const tarungAsEl = document.getElementById("tarungAs");
+    const tarungKopEl = document.getElementById("tarungKop");
+    const tarungKepalaEl = document.getElementById("tarungKepala");
+    const tarungEkorEl = document.getElementById("tarungEkor");
+    const tarungPreviewEl = document.getElementById("tarungPreview");
+
+    const bbfsDigitsEl = document.getElementById("bbfsDigits");
+    const bbfsLengthEl = document.getElementById("bbfsLength");
+    const bbfsRepeatEl = document.getElementById("bbfsRepeat");
+    const bbfsPreviewEl = document.getElementById("bbfsPreview");
+
+    const resultTitleEl = document.getElementById("resultTitle");
+    const resultsEl = document.getElementById("results");
+    const counterEl = document.getElementById("counter");
+    const toastEl = document.getElementById("toast");
+    const generateBtn = document.getElementById("generateBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    let activeMode = "random";
+    let currentNumbers = [];
+
+    function formatCount(value) {
+      return Number(value).toLocaleString("id-ID");
+    }
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(
+        () => toastEl.classList.remove("show"),
+        1900
+      );
+    }
+
+    function sanitizeDigitInput(input) {
+      const cleaned = input.value.replace(/\D/g, "").slice(0, 10);
+      input.value = cleaned;
+      return cleaned;
+    }
+
+    function uniqueDigits(value) {
+      return [...new Set(value.replace(/\D/g, "").split(""))];
+    }
+
+    function secureRandomInt(maxExclusive) {
+      if (!Number.isSafeInteger(maxExclusive) || maxExclusive <= 0) {
+        throw new Error("Batas angka tidak valid.");
+      }
+
+      const maxUint32 = 0x100000000;
+      const limit =
+        Math.floor(maxUint32 / maxExclusive) * maxExclusive;
+      const buffer = new Uint32Array(1);
+      let value;
+
+      do {
+        crypto.getRandomValues(buffer);
+        value = buffer[0];
+      } while (value >= limit);
+
+      return value % maxExclusive;
+    }
+
+    function renderNumbers(numbers) {
+      resultsEl.innerHTML = "";
+      counterEl.textContent = `${formatCount(numbers.length)} angka`;
+
+      if (!numbers.length) {
+        resultsEl.innerHTML = `
+          <div class="empty">
+            <div>
+              <span class="empty-icon">🎲</span>
+              Belum ada angka yang dibuat.
+            </div>
+          </div>`;
+        return;
+      }
+
+      const info = document.createElement("p");
+      info.className = "bulk-info";
+      info.textContent =
+        "Format hasil memakai tanda bintang (*) tanpa spasi. Klik kotak hasil untuk memilih semuanya.";
+
+      const textarea = document.createElement("textarea");
+      textarea.className = "bulk-results";
+      textarea.readOnly = true;
+      textarea.spellcheck = false;
+      textarea.wrap = "soft";
+      textarea.value = numbers.join("*");
+      textarea.title = "Klik untuk memilih seluruh hasil";
+
+      textarea.addEventListener("click", () => textarea.select());
+
+      resultsEl.append(info, textarea);
+    }
+
+    function setMode(mode) {
+      activeMode = mode;
+      currentNumbers = [];
+
+      modeTabs.forEach(tab => {
+        tab.classList.toggle("active", tab.dataset.mode === mode);
+      });
+
+      modePanels.forEach(panel => {
+        panel.classList.toggle(
+          "active",
+          panel.id === `${mode}Panel`
+        );
+      });
+
+      const titles = {
+        random: "Hasil Angka Acak",
+        tarung: "Hasil Angka Tarung",
+        bbfs: "Hasil BBFS"
+      };
+
+      const buttonLabels = {
+        random: "⚡ Generate Angka Acak",
+        tarung: "⚔ Generate Angka Tarung",
+        bbfs: "✦ Generate BBFS"
+      };
+
+      resultTitleEl.textContent = titles[mode];
+      generateBtn.textContent = buttonLabels[mode];
+      renderNumbers([]);
+    }
+
+    function getRandomQuantityLimit() {
+      const digits = Number(randomDigitsEl.value);
+      const totalCombinations = 10 ** digits;
+
+      return randomUniqueEl.checked
+        ? Math.min(totalCombinations, MAX_OUTPUT)
+        : MAX_OUTPUT;
+    }
+
+    function updateRandomLimit() {
+      const digits = Number(randomDigitsEl.value);
+      const limit = getRandomQuantityLimit();
+      const current = Number.parseInt(randomQuantityEl.value, 10);
+
+      randomQuantityEl.max = String(limit);
+      randomQuantityLabelEl.textContent =
+        `Jumlah kombinasi (maks. ${formatCount(limit)})`;
+
+      randomQuantityHintEl.textContent = randomUniqueEl.checked
+        ? `${digits}D memiliki ${formatCount(limit)} hasil unik.`
+        : `Hasil kembar diizinkan, maksimal ${formatCount(limit)} angka.`;
+
+      if (Number.isFinite(current) && current > limit) {
+        randomQuantityEl.value = String(limit);
+      }
+    }
+
+    function generateUniqueRandomValues(maxValue, quantity) {
+      const swaps = new Map();
+      const values = new Array(quantity);
+
+      for (let index = 0; index < quantity; index++) {
+        const randomIndex =
+          index + secureRandomInt(maxValue - index);
+
+        const selectedValue = swaps.has(randomIndex)
+          ? swaps.get(randomIndex)
+          : randomIndex;
+
+        const currentValue = swaps.has(index)
+          ? swaps.get(index)
+          : index;
+
+        swaps.set(randomIndex, currentValue);
+        values[index] = selectedValue;
+      }
+
+      return values;
+    }
+
+    function generateRandomNumbers() {
+      const digits = Number(randomDigitsEl.value);
+      const maxValue = 10 ** digits;
+      const limit = getRandomQuantityLimit();
+      let quantity =
+        Number.parseInt(randomQuantityEl.value, 10);
+
+      if (!Number.isFinite(quantity)) {
+        quantity = 1;
+      }
+
+      quantity = Math.max(1, Math.min(limit, quantity));
+      randomQuantityEl.value = String(quantity);
+
+      let values;
+
+      if (randomUniqueEl.checked) {
+        values = generateUniqueRandomValues(maxValue, quantity);
+      } else {
+        values = new Array(quantity);
+
+        for (let index = 0; index < quantity; index++) {
+          values[index] = secureRandomInt(maxValue);
+        }
+      }
+
+      return values.map(value =>
+        String(value).padStart(digits, "0")
+      );
+    }
+
+    function getTarungSets() {
+      return [
+        uniqueDigits(sanitizeDigitInput(tarungAsEl)),
+        uniqueDigits(sanitizeDigitInput(tarungKopEl)),
+        uniqueDigits(sanitizeDigitInput(tarungKepalaEl)),
+        uniqueDigits(sanitizeDigitInput(tarungEkorEl))
+      ];
+    }
+
+    function updateTarungPreview() {
+      const sets = getTarungSets();
+      const count = sets.reduce(
+        (total, set) => total * set.length,
+        1
+      );
+
+      tarungPreviewEl.innerHTML =
+        `Perkiraan hasil: <strong>${formatCount(count)} kombinasi 4D</strong>`;
+    }
+
+    function generateTarungNumbers() {
+      const sets = getTarungSets();
+
+      if (sets.some(set => set.length === 0)) {
+        throw new Error(
+          "Kolom AS, KOP, KEPALA, dan EKOR harus diisi."
+        );
+      }
+
+      const result = [];
+
+      for (const as of sets[0]) {
+        for (const kop of sets[1]) {
+          for (const kepala of sets[2]) {
+            for (const ekor of sets[3]) {
+              result.push(`${as}${kop}${kepala}${ekor}`);
+            }
+          }
+        }
+      }
+
+      return result;
+    }
+
+    function permutationCount(n, r) {
+      if (r > n) {
+        return 0;
+      }
+
+      let total = 1;
+
+      for (let index = 0; index < r; index++) {
+        total *= n - index;
+      }
+
+      return total;
+    }
+
+    function getBbfsSettings() {
+      const digits = uniqueDigits(sanitizeDigitInput(bbfsDigitsEl));
+      const length = Number(bbfsLengthEl.value);
+      const allowRepeat = bbfsRepeatEl.checked;
+
+      return { digits, length, allowRepeat };
+    }
+
+    function getBbfsCount() {
+      const { digits, length, allowRepeat } = getBbfsSettings();
+      const n = digits.length;
+
+      if (!n) {
+        return 0;
+      }
+
+      return allowRepeat
+        ? n ** length
+        : permutationCount(n, length);
+    }
+
+    function updateBbfsPreview() {
+      const { digits, length, allowRepeat } = getBbfsSettings();
+      const count = getBbfsCount();
+
+      let extra = "";
+
+      if (!allowRepeat && length > digits.length) {
+        extra = " — digit tidak cukup untuk hasil tanpa angka kembar";
+      } else if (count > MAX_OUTPUT) {
+        extra = ` — dibatasi maksimal ${formatCount(MAX_OUTPUT)}`;
+      }
+
+      bbfsPreviewEl.innerHTML =
+        `Perkiraan hasil: <strong>${formatCount(Math.min(count, MAX_OUTPUT))} kombinasi ${length}D</strong>${extra}`;
+    }
+
+    function generateBbfsNumbers() {
+      const { digits, length, allowRepeat } = getBbfsSettings();
+
+      if (!digits.length) {
+        throw new Error("Masukkan angka BBFS terlebih dahulu.");
+      }
+
+      if (!allowRepeat && length > digits.length) {
+        throw new Error(
+          `BBFS ${length}D tanpa angka kembar memerlukan minimal ${length} digit.`
+        );
+      }
+
+      const result = [];
+      const used = new Array(digits.length).fill(false);
+
+      function build(prefix) {
+        if (result.length >= MAX_OUTPUT) {
+          return;
+        }
+
+        if (prefix.length === length) {
+          result.push(prefix);
+          return;
+        }
+
+        for (let index = 0; index < digits.length; index++) {
+          if (!allowRepeat && used[index]) {
+            continue;
+          }
+
+          if (!allowRepeat) {
+            used[index] = true;
+          }
+
+          build(prefix + digits[index]);
+
+          if (!allowRepeat) {
+            used[index] = false;
+          }
+
+          if (result.length >= MAX_OUTPUT) {
+            break;
+          }
+        }
+      }
+
+      build("");
+      return result;
+    }
+
+    function generateActiveMode() {
+      try {
+        let numbers;
+
+        if (activeMode === "random") {
+          numbers = generateRandomNumbers();
+        } else if (activeMode === "tarung") {
+          numbers = generateTarungNumbers();
+        } else {
+          numbers = generateBbfsNumbers();
+        }
+
+        currentNumbers = numbers;
+        renderNumbers(currentNumbers);
+
+        if (window.matchMedia("(max-width: 820px)").matches) {
+          document.querySelector(".result-card").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+
+        if (numbers.length >= MAX_OUTPUT) {
+          showToast(
+            `Berhasil dibuat. Maksimal ${formatCount(MAX_OUTPUT)} hasil.`
+          );
+        } else {
+          showToast(
+            `${formatCount(numbers.length)} angka berhasil dibuat`
+          );
+        }
+      } catch (error) {
+        showToast(error.message || "Terjadi kesalahan.");
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Semua angka berhasil disalin");
+      } catch {
+        showToast("Gagal menyalin");
+      }
+
+      textarea.remove();
+    }
+
+    async function copyAll() {
+      if (!currentNumbers.length) {
+        showToast("Belum ada angka");
+        return;
+      }
+
+      const text = currentNumbers.join("*");
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Semua angka berhasil disalin");
+      } catch {
+        fallbackCopy(text);
+      }
+    }
+
+    function clearResults() {
+      currentNumbers = [];
+      renderNumbers([]);
+      showToast("Hasil dibersihkan");
+    }
+
+    modeTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        setMode(tab.dataset.mode);
+      });
+    });
+
+    generateBtn.addEventListener("click", generateActiveMode);
+    copyBtn.addEventListener("click", copyAll);
+    clearBtn.addEventListener("click", clearResults);
+
+    randomDigitsEl.addEventListener("change", updateRandomLimit);
+    randomUniqueEl.addEventListener("change", updateRandomLimit);
+
+    randomQuantityEl.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        generateActiveMode();
+      }
+    });
+
+    [
+      tarungAsEl,
+      tarungKopEl,
+      tarungKepalaEl,
+      tarungEkorEl
+    ].forEach(input => {
+      input.addEventListener("input", updateTarungPreview);
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          generateActiveMode();
+        }
+      });
+    });
+
+    bbfsDigitsEl.addEventListener("input", updateBbfsPreview);
+    bbfsLengthEl.addEventListener("change", updateBbfsPreview);
+    bbfsRepeatEl.addEventListener("change", updateBbfsPreview);
+
+    bbfsDigitsEl.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        generateActiveMode();
+      }
+    });
+
+    updateRandomLimit();
+    updateTarungPreview();
+    updateBbfsPreview();
+  </script>
+</body>
+</html>
